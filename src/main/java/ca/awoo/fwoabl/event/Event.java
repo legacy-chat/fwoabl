@@ -1,4 +1,4 @@
-package ca.awoo.fwoabl;
+package ca.awoo.fwoabl.event;
 
 import java.util.Collections;
 import java.util.HashSet;

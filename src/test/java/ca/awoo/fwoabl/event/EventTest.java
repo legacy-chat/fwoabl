@@ -1,4 +1,4 @@
-package ca.awoo.fwoabl;
+package ca.awoo.fwoabl.event;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,6 +6,7 @@ import org.junit.Test;
 
 /**
  * Test the Event class.
+ * @see Event
  */
 public class EventTest {
     /**
