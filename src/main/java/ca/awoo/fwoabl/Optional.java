@@ -160,6 +160,11 @@ public interface Optional<T> {
      */
     public void consume(Consumer<T> c);
 
+    /**
+     * Get the value of this Optional.
+     * @return The value of this Optional.
+     * @throws OptionalNoneException If this Optional has no value.
+     */
     public T get() throws OptionalNoneException;
 
 }
