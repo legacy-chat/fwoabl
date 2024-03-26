@@ -38,6 +38,10 @@ public interface Optional<T> {
             c.invoke(value);
         }
 
+        public T get() throws OptionalNoneException {
+            return value;
+        }
+
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -96,6 +100,10 @@ public interface Optional<T> {
         public void consume(Consumer<T> c) {
         }
 
+        public T get() throws OptionalNoneException {
+            throw new OptionalNoneException();
+        }
+
         @Override
         public int hashCode() {
             return 0;
@@ -151,5 +159,7 @@ public interface Optional<T> {
      * @param c The function to apply to the value of this Optional.
      */
     public void consume(Consumer<T> c);
+
+    public T get() throws OptionalNoneException;
 
 }
