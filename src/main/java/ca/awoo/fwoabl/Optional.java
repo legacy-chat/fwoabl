@@ -1,146 +1,155 @@
 package ca.awoo.fwoabl;
 
+import ca.awoo.fwoabl.function.Consumer;
+import ca.awoo.fwoabl.function.Function;
+
 /**
  * A simple implementation of the Option type.
  */
-public class Optional<T> {
-    private final T value;
+public interface Optional<T> {
+    public static class Some<T> implements Optional<T>{
+        private final T value;
 
-    /**
-     * Create a new Optional with the given value.
-     * @param value The value to wrap.
-     */
-    public Optional(T value) {
-        this.value = value;
+        public Some(T value){
+            this.value = value;
+        }
+
+        public boolean isSome() {
+            return true;
+        }
+
+        public boolean isNone() {
+            return false;
+        }
+
+        public T or(T defaultValue) {
+            return value;
+        }
+
+        public Optional<T> or(Optional<T> other) {
+            return this;
+        }
+
+        public <U> Optional<U> map(Function<T, U> f) {
+            return new Some<U>(f.invoke(value));
+        }
+
+        public void consume(Consumer<T> c) {
+            c.invoke(value);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((value == null) ? 0 : value.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Some<?> other = (Some<?>) obj;
+            if (value == null) {
+                if (other.value != null)
+                    return false;
+            } else if (!value.equals(other.value))
+                return false;
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "Some(" + value.toString() + ")";
+        }
     }
 
-    /**
-     * Create a new Optional with the given value.
-     * @param <T> The type of the value.
-     * @param value The value to wrap.
-     * @return A new Optional wrapping the given value.
-     */
-    public static <T> Optional<T> some(T value){
-        return new Optional<T>(value);
-    }
+    public static class None<T> implements Optional<T> {
 
-    /**
-     * Create a new Optional with no value.
-     * @param <T> The type of the value.
-     * @param clazz The class of the value. Not used, but required for Java generics.
-     * @return A new Optional with no value.
-     */
-    public static <T> Optional<T> none(Class<T> clazz){
-        return new Optional<T>(null);
+        public None(){}
+
+        public boolean isSome() {
+            return false;
+        }
+
+        public boolean isNone() {
+            return true;
+        }
+
+        public T or(T defaultValue) {
+            return defaultValue;
+        }
+
+        public Optional<T> or(Optional<T> other) {
+            return other;
+        }
+
+        public <U> Optional<U> map(Function<T, U> f) {
+            return new None<U>();
+        }
+
+        public void consume(Consumer<T> c) {
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof None;
+        }
+
+        @Override
+        public String toString() {
+            return "None";
+        }
     }
 
     /**
      * Check if this Optional has a value.
      * @return True if this Optional has a value, false otherwise.
      */
-    public boolean isSome(){
-        return value != null;
-    }
+    public boolean isSome();
 
     /**
      * Check if this Optional has no value.
      * @return True if this Optional has no value, false otherwise.
      */
-    public boolean isNone(){
-        return value == null;
-    }
-
-    /**
-     * Get the value of this Optional.
-     * @return The value of this Optional.
-     */
-    public T get(){
-        return value;
-    }
+    public boolean isNone();
 
     /**
      * Get the value of this Optional, or the given default value if this Optional has no value.
      * @param defaultValue The default value to return if this Optional has no value.
      * @return The value of this Optional, or the given default value if this Optional has no value.
      */
-    public T getOrElse(T defaultValue){
-        if (isSome()){
-            return value;
-        } else {
-            return defaultValue;
-        }
-    }
+    public T or(T defaultValue);
 
     /**
      * Get the value of this Optional, or the value of the given Optional if this Optional has no value.
      * @param other The Optional to use if this Optional has no value.
      * @return The value of this Optional, or the value of the given Optional if this Optional has no value.
      */
-    public Optional<T> or(Optional<T> other){
-        if (isSome()){
-            return this;
-        } else {
-            return other;
-        }
-    }
+    public Optional<T> or(Optional<T> other);
 
     /**
-     * Get the value of this Optional, or the given default value if this Optional has no value.
-     * @param defaultValue The default value to return if this Optional has no value.
-     * @return The value of this Optional, or the given default value if this Optional has no value.
+     * Map the value of this Optional to a new value.
+     * @param <U> The type of the new value.
+     * @param f The function to apply to the value of this Optional.
+     * @return An Optional containing the new value, or None if this Optional has no value.
      */
-    public Optional<T> orElse(T defaultValue){
-        if (isSome()){
-            return this;
-        } else {
-            return new Optional<T>(defaultValue);
-        }
-    }
+    public <U> Optional<U> map(Function<T, U> f);
 
     /**
-     * Check if this Optional is equal to the given object.
-     * @param other The object to compare to.
-     * @return True if this Optional is equal to the given object, false otherwise.
+     * Consume the value of this Optional, if it has one.
+     * @param c The function to apply to the value of this Optional.
      */
-    @Override
-    public boolean equals(Object other){
-        if (other instanceof Optional){
-            Optional<?> otherOptional = (Optional<?>)other;
-            if (isSome() && otherOptional.isSome()){
-                return value.equals(otherOptional.value);
-            } else if (isNone() && otherOptional.isNone()){
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
+    public void consume(Consumer<T> c);
 
-    /**
-     * Get the hash code of this Optional.
-     * @return The hash code of this Optional.
-     */
-    @Override
-    public int hashCode(){
-        if (isSome()){
-            return value.hashCode();
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Get a string representation of this Optional.
-     * @return A string representation of this Optional.
-     */
-    @Override
-    public String toString(){
-        if (isSome()){
-            return "Some(" + value.toString() + ")";
-        } else {
-            return "None";
-        }
-    }
 }
