@@ -6,6 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import ca.awoo.fwoabl.function.Consumer;
+import ca.awoo.fwoabl.function.Function;
+
 /**
  * Unit tests for {@link Optional}.
  */
@@ -16,10 +19,9 @@ public class OptionalTest {
      */
     @Test
     public void testSome(){
-        Optional<String> some = Optional.some("Hello");
+        Optional<String> some = new Optional.Some<String>("Hello");
         assertTrue("isSome()", some.isSome());
         assertFalse("isNone()", some.isNone());
-        assertEquals("get()", "Hello", some.get());
     }
 
     /**
@@ -28,49 +30,79 @@ public class OptionalTest {
      */
     @Test
     public void testNone(){
-        Optional<String> none = Optional.none(String.class);
+        Optional<String> none = new Optional.None<String>();
         assertFalse("isSome()", none.isSome());
         assertTrue("isNone()", none.isNone());
     }
 
     /**
-     * Test the {@link Optional#getOrElse(Object)} method.
-     * @see Optional#getOrElse(Object)
+     * Test the {@link Optional#or(Object)} method.
+     * @see Optional#or(Object)
      */
     @Test
-    public void testGetOrElse(){
-        Optional<String> some = Optional.some("Hello");
-        assertEquals("getOrElse()", "Hello", some.getOrElse("Goodbye"));
-        Optional<String> none = Optional.none(String.class);
-        assertEquals("getOrElse()", "Goodbye", none.getOrElse("Goodbye"));
+    public void testOrObject(){
+        Optional<String> some = new Optional.Some<String>("Hello");
+        assertEquals("or()", "Hello", some.or("Goodbye"));
+        Optional<String> none = new Optional.None<String>();
+        assertEquals("or()", "Goodbye", none.or("Goodbye"));
     }
 
+    
     /**
      * Test the {@link Optional#or(Optional)} method.
      * @see Optional#or(Optional)
      */
     @Test
     public void testOr(){
-        Optional<String> some = Optional.some("Hello");
-        assertEquals("or()", some, some.or(Optional.some("Goodbye")));
-        assertEquals("or()", some, some.or(Optional.none(String.class)));
-        Optional<String> none = Optional.none(String.class);
-        assertEquals("or()", Optional.some("Goodbye"), none.or(Optional.some("Goodbye")));
-        assertEquals("or()", Optional.none(String.class), none.or(Optional.none(String.class)));
+        Optional<String> some = new Optional.Some<String>("Hello");
+        assertEquals("or()", some, some.or(new Optional.Some<String>("Goodbye")));
+        assertEquals("or()", some, some.or(new Optional.None<String>()));
+        Optional<String> none = new Optional.None<String>();
+        assertEquals("or()", new Optional.Some<String>("Goodbye"), none.or(new Optional.Some<String>("Goodbye")));
+        assertEquals("or()", new Optional.None<String>(),                none.or(new Optional.None<String>()));
     }
 
     /**
-     * Test the {@link Optional#orElse(Object)} method.
-     * @see Optional#orElse(Object)
+     * Test the {@link Optional#map(Function)} method.
+     * @see Optional#map(Function)
      */
     @Test
-    public void testOrElse(){
-        Optional<String> some = Optional.some("Hello");
-        assertEquals("orElse()", some, some.orElse("Goodbye"));
-        assertEquals("orElse()", some, some.orElse(null));
-        Optional<String> none = Optional.none(String.class);
-        assertEquals("orElse()", Optional.some("Goodbye"), none.orElse("Goodbye"));
-        assertEquals("orElse()", Optional.none(String.class), none.orElse(null));
+    public void testMap(){
+        Optional<String> some = new Optional.Some<String>("Hello");
+        assertEquals("map()", new Optional.Some<Integer>(5), some.map(new Function<String, Integer>(){
+            public Integer invoke(String s){
+                return s.length();
+            }
+        }));
+        Optional<String> none = new Optional.None<String>();
+        assertEquals("map()", new Optional.None<Integer>(), none.map(new Function<String, Integer>(){
+            public Integer invoke(String s){
+                return s.length();
+            }
+        }));
+    }
+
+    /**
+     * Test the {@link Optional#consume(Consumer)} method.
+     * @see Optional#consume(Consumer)
+     */
+    @Test
+    public void testConsume(){
+        Optional<String> some = new Optional.Some<String>("Hello");
+        final StringBuilder sb = new StringBuilder();
+        some.consume(new Consumer<String>(){
+            public void invoke(String s){
+                sb.append(s);
+            }
+        });
+        assertEquals("consume()", "Hello", sb.toString());
+        Optional<String> none = new Optional.None<String>();
+        none.consume(new Consumer<String>(){
+            public void invoke(String s){
+                sb.append(s);
+            }
+        });
+        assertEquals("consume()", "Hello", sb.toString());
     }
     
 }
