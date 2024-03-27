@@ -2,6 +2,7 @@ package ca.awoo.fwoabl;
 
 import ca.awoo.fwoabl.function.Consumer;
 import ca.awoo.fwoabl.function.Function;
+import ca.awoo.fwoabl.function.Predicate;
 
 /**
  * A simple implementation of the Option type.
@@ -36,6 +37,14 @@ public interface Optional<T> {
 
         public void consume(Consumer<T> c) {
             c.invoke(value);
+        }
+
+        public boolean test(Predicate<T> p) {
+            return p.invoke(value);
+        }
+
+        public boolean test(Predicate<T> p, boolean defaultValue) {
+            return p.invoke(value);
         }
 
         public T get() throws OptionalNoneException {
@@ -100,6 +109,14 @@ public interface Optional<T> {
         public void consume(Consumer<T> c) {
         }
 
+        public boolean test(Predicate<T> p) {
+            return false;
+        }
+
+        public boolean test(Predicate<T> p, boolean defaultValue) {
+            return defaultValue;
+        }
+
         public T get() throws OptionalNoneException {
             throw new OptionalNoneException();
         }
@@ -159,6 +176,21 @@ public interface Optional<T> {
      * @param c The function to apply to the value of this Optional.
      */
     public void consume(Consumer<T> c);
+
+    /**
+     * Test the contents of this optional. If this Optional has no value, return false.
+     * @param p The predicate to test the value of this Optional with.
+     * @return The result of the test, or false if this Optional has no value.
+     */
+    public boolean test(Predicate<T> p);
+
+    /**
+     * Test the contents of this optional. If this Optional has no value, return the given default value.
+     * @param p The predicate to test the value of this Optional with.
+     * @param defaultValue The default value to return if this Optional has no value.
+     * @return The result of the test, or the default value if this Optional has no value.
+     */
+    public boolean test(Predicate<T> p, boolean defaultValue);
 
     /**
      * Get the value of this Optional.
