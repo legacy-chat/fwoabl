@@ -27,7 +27,7 @@ public final class Functions {
      * @param value The value to compare against.
      * @return A predicate that tests if its argument is equal to the given value.
      */
-    public static <T> Predicate<T> equals(final T value){
+    public static <T> Predicate<T> equal(final T value){
         return new Predicate<T>(){
             public boolean invoke(T arg){
                 return value.equals(arg);
