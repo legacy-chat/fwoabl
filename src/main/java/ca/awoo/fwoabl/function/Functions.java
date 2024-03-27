@@ -80,6 +80,32 @@ public final class Functions {
     }
 
     /**
+     * A predicate that returns true always.
+     * @param <T> The type of the argument.
+     * @return A predicate that returns true always.
+     */
+    public static <T> Predicate<T> alwaysTrue(){
+        return new Predicate<T>(){
+            public boolean invoke(T arg){
+                return true;
+            }
+        };
+    }
+
+    /**
+     * A predicate that returns false always.
+     * @param <T> The type of the argument.
+     * @return A predicate that returns false always.
+     */
+    public static <T> Predicate<T> alwaysFalse(){
+        return new Predicate<T>(){
+            public boolean invoke(T arg){
+                return false;
+            }
+        };
+    }
+
+    /**
      * A supplier that always returns the given value.
      * @param <T> The type of the value.
      * @param value The value to return.
